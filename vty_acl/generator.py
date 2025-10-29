@@ -16,7 +16,7 @@ def generate_for_sites(
     output_name: str | None,
 ) -> None:
     ensure_dir(results_dir)
-    variables_root = repo_root / "variables" / "vty_ACL"
+    variables_root = repo_root / "config_templates" / "variables" / "vty_ACL"
 
     for site in sites:
         variables_path = variables_root / site / variables_file
@@ -85,7 +85,7 @@ def main(argv: Iterable[str] | None = None) -> None:
     )
     parser.add_argument(
         "--template-dir",
-        default=str(Path("temlpates_j2") / "vty_ACL"),
+        default=str(Path("config_templates") / "temlpates_j2" / "vty_ACL"),
         help="Directory containing Jinja2 template",
     )
     parser.add_argument(
@@ -97,7 +97,9 @@ def main(argv: Iterable[str] | None = None) -> None:
     args = parser.parse_args(list(argv) if argv is not None else None)
 
     repo_root = Path(__file__).resolve().parent.parent
-    variables_root = repo_root / "variables" / "vty_ACL"
+    print(f"{repo_root=}")
+    variables_root = repo_root / "config_templates" / "variables" / "vty_ACL"
+    print(f"{variables_root=}")
 
     raw_site = (args.site or "").strip()
     if raw_site.upper() == "ALL":
@@ -128,3 +130,5 @@ def main(argv: Iterable[str] | None = None) -> None:
     )
 
 
+if __name__ == "__main__":
+    main()

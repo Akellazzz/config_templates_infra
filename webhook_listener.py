@@ -5,7 +5,7 @@ from typing import Tuple, Optional
 
 from fastapi import FastAPI, Header, BackgroundTasks
 from fastapi.responses import PlainTextResponse
-
+from vty_acl.generator import main as vty_acl_generator
 
 
 REPO_NAME="config_templates"
@@ -121,11 +121,7 @@ def trigger_generation() -> None:
         print(f"Current commit ID: {commit_id}")
         
         # Dynamic import to avoid hardcoding
-        import importlib
-        module_path = f"{REPO_NAME}.{VTY_ACL_MODULE_NAME}"
-        print(f"{module_path=}")
-        module = importlib.import_module(module_path)
-        module.main()
+        vty_acl_generator()
         
         print("Generation finished successfully")
         
@@ -165,8 +161,9 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run("webhook_listener:app", host="0.0.0.0", port=8080, reload=False)
 
-
-# curl -X POST http://localhost:8080/webhook \
-#   -H 'Content-Type: application/json' \
-#   -H 'X-Gitlab-Event: Push Hook' \
-#   -d '{"ref":"refs/heads/develop"}'
+"""
+curl -X POST http://localhost:8080/webhook \
+  -H 'Content-Type: application/json' \
+  -H 'X-Gitlab-Event: Push Hook' \
+  -d '{"ref":"refs/heads/develop"}'
+"""
