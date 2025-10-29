@@ -8,7 +8,6 @@ from app_config import settings
 
 
 def generate_for_sites(
-    repo_root: Path,
     sites: List[str],
     variables_file: str,
     results_dir: Path,
@@ -17,10 +16,9 @@ def generate_for_sites(
     output_name: str | None,
 ) -> None:
     ensure_dir(results_dir)
-    variables_root = repo_root / settings.REPO_NAME / "variables" / "vty_ACL"
 
     for site in sites:
-        variables_path = variables_root / site / variables_file
+        variables_path = settings.variables_root / site / variables_file
         acl_entries = read_acl_entries(variables_path)
 
         context = {
@@ -86,7 +84,7 @@ def main(argv: Iterable[str] | None = None) -> None:
     )
     parser.add_argument(
         "--template-dir",
-        default=str(Path("config_templates") / "temlpates_j2" / "vty_ACL"),
+        default=str(settings.templates_root),
         help="Directory containing Jinja2 template",
     )
     parser.add_argument(
@@ -97,16 +95,11 @@ def main(argv: Iterable[str] | None = None) -> None:
 
     args = parser.parse_args(list(argv) if argv is not None else None)
 
-    repo_root = Path(__file__).resolve().parent.parent
-    print(f"{repo_root=}")
-    variables_root = repo_root / "config_templates" / "variables" / "vty_ACL"
-    print(f"{variables_root=}")
-
     raw_site = (args.site or "").strip()
     if raw_site.upper() == "ALL":
-        sites: List[str] = list_all_sites(variables_root)
+        sites: List[str] = list_all_sites(settings.variables_root)
         if not sites:
-            raise FileNotFoundError(f"No sites found under: {variables_root}")
+            raise FileNotFoundError(f"No sites found under: {settings.variables_root}")
     elif "," in raw_site:
         sites = [s.strip() for s in raw_site.split(",") if s.strip()]
     else:
@@ -114,14 +107,13 @@ def main(argv: Iterable[str] | None = None) -> None:
 
     template_dir = Path(args.template_dir)
     if not template_dir.is_absolute():
-        template_dir = repo_root / template_dir
+        template_dir = settings.repo_root / template_dir
 
     results_dir = Path(args.results_dir)
     if not results_dir.is_absolute():
-        results_dir = repo_root / results_dir
+        results_dir = settings.repo_root / results_dir
 
     generate_for_sites(
-        repo_root=repo_root,
         sites=sites,
         variables_file=args.variables_file,
         results_dir=results_dir,

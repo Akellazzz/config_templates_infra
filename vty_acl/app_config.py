@@ -3,11 +3,14 @@ from pathlib import Path
 
 class Settings:
     REPO_NAME = "config_templates"
-    REPO_URL = "https://github.com/Akellazzz/config_templates.git"
-    DEFAULT_BRANCH = "develop"
-    # Path to repo is now one level up since we're in vty_acl/
-    DEST_DIR = (Path(__file__).resolve().parent.parent / REPO_NAME).as_posix()
+    REPO_DEFAULT_BRANCH = "vars"
+    REPO_URL = f"https://github.com/Akellazzz/{REPO_NAME}.git"
+    VARIABLES_RELPATH = Path("variables/vty_ACL/")
+    TEMPLATES_RELPATH = Path("templates_j2/vty_ACL/")
+    
+    repo_root = Path(__file__).resolve().parent / REPO_NAME
+    result_config_dir = repo_root / "result_config"
+    variables_root = repo_root / VARIABLES_RELPATH
+    templates_root = Path(__file__).resolve().parent / TEMPLATES_RELPATH
 
-
-# Создание экземпляра настроек
 settings = Settings()

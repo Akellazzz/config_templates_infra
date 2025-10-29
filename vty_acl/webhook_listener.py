@@ -33,7 +33,9 @@ def _get_current_commit_id(repo_path: Path) -> str:
 
 
 def sync_repo(
-    repo_url: str = settings.REPO_URL, branch: str = settings.DEFAULT_BRANCH, dest_dir: str = settings.DEST_DIR
+    repo_url: str = settings.REPO_URL,
+    branch: str = settings.REPO_DEFAULT_BRANCH,
+    dest_dir: str = settings.repo_root,
 ) -> Path:
     dest_path = Path(dest_dir)
     try:
@@ -167,8 +169,8 @@ async def webhook(
     if isinstance(payload, dict):
         ref = payload.get("ref")
 
-    if ref and ref not in (f"refs/heads/{settings.DEFAULT_BRANCH}", settings.DEFAULT_BRANCH):
-        return PlainTextResponse("Ignored (non-main branch)\n", status_code=202)
+    if ref and ref not in (f"refs/heads/{settings.REPO_DEFAULT_BRANCH}", settings.REPO_DEFAULT_BRANCH):
+        return PlainTextResponse(f"Branch {ref} ignored\n", status_code=202)
 
     background_tasks.add_task(trigger_generation)
     return PlainTextResponse("OK\n", status_code=200)
@@ -177,11 +179,11 @@ async def webhook(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("webhook_listener:app", host="0.0.0.0", port=8080, reload=False)
+    uvicorn.run("webhook_listener:app", host="0.0.0.0", port=8080, reload=True)
 
 """
 curl -X POST http://localhost:8080/webhook \
   -H 'Content-Type: application/json' \
   -H 'X-Gitlab-Event: Push Hook' \
-  -d '{"ref":"refs/heads/develop"}'
+  -d '{"ref":"refs/heads/vars"}'
 """
