@@ -2,8 +2,8 @@ import argparse
 from pathlib import Path
 from typing import Iterable, List
 
-from .io_utils import ensure_dir, list_all_sites, read_acl_entries
-from .render import render_template
+from io_utils import ensure_dir, list_all_sites, read_acl_entries
+from render import render_template
 
 
 def generate_for_sites(

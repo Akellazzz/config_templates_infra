@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List
 
-from .models import AclEntry
+from models import AclEntry
 
 
 def read_acl_entries(file_path: Path) -> List[AclEntry]:

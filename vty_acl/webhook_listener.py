@@ -5,14 +5,14 @@ from typing import Tuple, Optional
 
 from fastapi import FastAPI, Header, BackgroundTasks
 from fastapi.responses import PlainTextResponse
-from vty_acl.generator import main as vty_acl_generator
+from generator import main as vty_acl_generator
 
 
 REPO_NAME="config_templates"
 REPO_URL = "https://github.com/Akellazzz/config_templates.git"
 DEFAULT_BRANCH = "develop"
-DEST_DIR = (Path(__file__).resolve().parent / REPO_NAME).as_posix()
-VTY_ACL_MODULE_NAME = "vty_acl"
+# Path to repo is now one level up since we're in vty_acl/
+DEST_DIR = (Path(__file__).resolve().parent.parent / REPO_NAME).as_posix()
 
 def _run_git_command(args: list[str]) -> None:
     result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
@@ -120,7 +120,6 @@ def trigger_generation() -> None:
         commit_id = _get_current_commit_id(repo_path)
         print(f"Current commit ID: {commit_id}")
         
-        # Dynamic import to avoid hardcoding
         vty_acl_generator()
         
         print("Generation finished successfully")
@@ -167,3 +166,4 @@ curl -X POST http://localhost:8080/webhook \
   -H 'X-Gitlab-Event: Push Hook' \
   -d '{"ref":"refs/heads/develop"}'
 """
+
