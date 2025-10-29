@@ -4,8 +4,10 @@ from pathlib import Path
 from app_config import settings
 from generator import main as vty_acl_generator
 from git_utils import (
+    checkout_tracking_branch,
     create_release_candidate_branch,
     get_current_commit_id,
+    list_remote_branches,
     sync_repo,
 )
 import shutil
@@ -36,16 +38,34 @@ def trigger_generation() -> None:
         )
         print(f"Репозиторий готов в {repo_path}. Запуск генерации...")
         
-        # Получение ID коммита перед генерацией
-        commit_id = get_current_commit_id(repo_path)
-        print(f"Текущий ID коммита: {commit_id}")
+        # Получаем список веток по маске 'candidate*'
+        candidate_branches = list_remote_branches(repo_path, "candidate*")
+        if not candidate_branches:
+            print("Не найдено веток по маске 'candidate*'")
         
-        # Запуск генерации
-        vty_acl_generator()
-        print("Генерация успешно завершена")
-        
-        # Создание ветки release candidate с результатами генерации
-        create_release_candidate_branch(repo_path, commit_id)
+        errors: list[str] = []
+        for branch in candidate_branches:
+            try:
+                print(f"\n=== Обработка ветки {branch} ===")
+                checkout_tracking_branch(repo_path, branch)
+
+                # Получение ID коммита для текущей ветки
+                commit_id = get_current_commit_id(repo_path)
+                print(f"Текущий ID коммита ({branch}): {commit_id}")
+
+                # Запуск генерации
+                vty_acl_generator()
+                print(f"Генерация успешно завершена для {branch}")
+
+                # Создание ветки release candidate с результатами генерации
+                create_release_candidate_branch(repo_path, commit_id)
+            except Exception as branch_exc:
+                msg = f"Ошибка при обработке ветки {branch}: {branch_exc}"
+                print(msg)
+                errors.append(msg)
+
+        if errors:
+            raise GenerationError("; ".join(errors))
         
     except Exception as exc:
         error_msg = f"Ошибка генерации: {exc}"

@@ -49,6 +49,36 @@ def get_current_commit_id(repo_path: Path, short: bool = True) -> str:
     return run_git_command(args, repo_path)
 
 
+def list_remote_branches(repo_path: Path, pattern: str) -> list[str]:
+    """Возвращает список удалённых веток origin, соответствующих шаблону.
+
+    Args:
+        repo_path: Путь к локальному клону репозитория
+        pattern: Шаблон для фильтрации веток, например 'candidate*'
+
+    Returns:
+        Список имён веток без префикса 'origin/'
+    """
+    output = run_git_command(["branch", "-r", "--list", f"origin/{pattern}"], repo_path)
+    branches: list[str] = []
+    for line in output.splitlines():
+        name = line.strip()
+        if not name:
+            continue
+        if name.startswith("origin/"):
+            name = name[len("origin/"):]
+        branches.append(name)
+    return branches
+
+
+def checkout_tracking_branch(repo_path: Path, branch: str) -> None:
+    """Переключается на локальную ветку, отслеживающую origin/<branch>.
+
+    Создаёт/обновляет локальную ветку командой 'git checkout -B <branch> origin/<branch>'.
+    """
+    run_git_command(["checkout", "-B", branch, f"origin/{branch}"], repo_path)
+
+
 def sync_repo(
     repo_url: str,
     branch: str,
@@ -68,7 +98,8 @@ def sync_repo(
     
     if (dest_path / ".git").exists():
         print(f"Синхронизация существующего репозитория в {dest_path}...")
-        run_git_command(["fetch", "origin", "--prune"], dest_path)
+        # Забираем все ветки и теги
+        run_git_command(["fetch", "--all", "--prune"], dest_path)
         run_git_command(["checkout", branch], dest_path)
         run_git_command(["reset", "--hard", f"origin/{branch}"], dest_path)
     else:
@@ -76,18 +107,10 @@ def sync_repo(
             dest_path.mkdir(parents=True, exist_ok=True)
         
         print(f"Клонирование {repo_url} (ветка {branch}) в {dest_path}...")
-        run_git_command(
-            [
-                "clone",
-                "--depth",
-                "1",
-                "--single-branch",
-                "--branch",
-                branch,
-                repo_url,
-                dest_path.as_posix(),
-            ]
-        )
+        # Клонируем репозиторий с полной историей и всеми ветками
+        run_git_command(["clone", "--branch", branch, repo_url, dest_path.as_posix()])
+        # Сразу обновляем все ссылки и ветки
+        run_git_command(["fetch", "--all", "--prune"], dest_path)
     
     return dest_path
 
