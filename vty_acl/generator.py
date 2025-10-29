@@ -4,6 +4,7 @@ from typing import Iterable, List
 
 from io_utils import ensure_dir, list_all_sites, read_acl_entries
 from render import render_template
+from app_config import settings
 
 
 def generate_for_sites(
@@ -16,7 +17,7 @@ def generate_for_sites(
     output_name: str | None,
 ) -> None:
     ensure_dir(results_dir)
-    variables_root = repo_root / "config_templates" / "variables" / "vty_ACL"
+    variables_root = repo_root / settings.REPO_NAME / "variables" / "vty_ACL"
 
     for site in sites:
         variables_path = variables_root / site / variables_file

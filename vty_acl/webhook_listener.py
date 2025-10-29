@@ -5,13 +5,8 @@ from typing import Optional
 from fastapi import FastAPI, Header, BackgroundTasks
 from fastapi.responses import PlainTextResponse
 from generator import main as vty_acl_generator
+from app_config import settings
 
-
-REPO_NAME = "config_templates"
-REPO_URL = "https://github.com/Akellazzz/config_templates.git"
-DEFAULT_BRANCH = "develop"
-# Path to repo is now one level up since we're in vty_acl/
-DEST_DIR = (Path(__file__).resolve().parent.parent / REPO_NAME).as_posix()
 
 
 def _run_git_command(args: list[str]) -> None:
@@ -38,7 +33,7 @@ def _get_current_commit_id(repo_path: Path) -> str:
 
 
 def sync_repo(
-    repo_url: str = REPO_URL, branch: str = DEFAULT_BRANCH, dest_dir: str = DEST_DIR
+    repo_url: str = settings.REPO_URL, branch: str = settings.DEFAULT_BRANCH, dest_dir: str = settings.DEST_DIR
 ) -> Path:
     dest_path = Path(dest_dir)
     try:
@@ -172,7 +167,7 @@ async def webhook(
     if isinstance(payload, dict):
         ref = payload.get("ref")
 
-    if ref and ref not in (f"refs/heads/{DEFAULT_BRANCH}", DEFAULT_BRANCH):
+    if ref and ref not in (f"refs/heads/{settings.DEFAULT_BRANCH}", settings.DEFAULT_BRANCH):
         return PlainTextResponse("Ignored (non-main branch)\n", status_code=202)
 
     background_tasks.add_task(trigger_generation)
