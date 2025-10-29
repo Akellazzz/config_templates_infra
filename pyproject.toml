@@ -1,0 +1,19 @@
+[project]
+name = "config-templates"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Akella101",email = "eekosyanenko@yandex.ru"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "jinja2 (>=3.1.6,<4.0.0)",
+    "fastapi[uvicorn] (>=0.120.1,<0.121.0)",
+    "uvicorn (>=0.38.0,<0.39.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
