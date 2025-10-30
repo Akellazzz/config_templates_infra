@@ -38,7 +38,13 @@ gitGraph
     commit id: "Коммит в variables"
     commit id: "Коммит в result"
     checkout main
-    merge candidate_SRTxxxxx tag: "Merge и удаление ветки candidate"
+    merge candidate_SRTxxxxx id: "Merge SRTxxxxx"
+    branch candidate_SRTyyyyy
+    checkout candidate_SRTyyyyy
+    commit id: "Коммит_ в variables"
+    commit id: "Коммит_ в result"
+    checkout main
+    merge candidate_SRTyyyyy id: "Merge SRTyyyyy"
 ```
 
 ## Sequence Diagram
