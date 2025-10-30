@@ -30,21 +30,72 @@
 - Возможны конфликты нескольких "долгоиграющих" изменений
 
 ## GIT graph
+### Одно изменение
 ```mermaid
 gitGraph
     commit id: "Initial"
     branch candidate_SRTxxxxx
     checkout candidate_SRTxxxxx
     commit id: "Коммит в variables"
-    commit id: "Коммит в result"
+    commit id: "Коммит в result" type: HIGHLIGHT
+    checkout main
+    merge candidate_SRTxxxxx id: "Merge SRTxxxxx"
+```
+### Последовательные изменения
+```mermaid
+gitGraph
+    commit id: "Initial"
+    branch candidate_SRTxxxxx
+    checkout candidate_SRTxxxxx
+    commit id: "Коммит в variables"
+    commit id: "Коммит в result" type: HIGHLIGHT
     checkout main
     merge candidate_SRTxxxxx id: "Merge SRTxxxxx"
     branch candidate_SRTyyyyy
     checkout candidate_SRTyyyyy
     commit id: "Коммит_ в variables"
-    commit id: "Коммит_ в result"
+    commit id: "Коммит_ в result" type: HIGHLIGHT
     checkout main
     merge candidate_SRTyyyyy id: "Merge SRTyyyyy"
+```
+
+### Предварительная подготовка переменных без генерации конфига
+```mermaid
+gitGraph
+    commit id: "Initial"
+    checkout main
+    branch prepare_SRTzzzzz
+    commit id: "Коммит1 в variables"
+    commit id: "Коммит2 в variables" 
+    commit id: "Коммит3 в variables"
+    commit id: "Коммит4 в variables"
+    branch candidate_SRTzzzzz
+    checkout candidate_SRTzzzzz
+    commit id: "Коммит в result" type: HIGHLIGHT
+    checkout main
+    merge candidate_SRTzzzzz id: "Merge SRTzzzzz"
+```
+
+### Параллельная работа над переменными
+```mermaid
+gitGraph
+    commit id: "Initial"
+    branch candidate_SRTyyyyy
+    checkout candidate_SRTyyyyy
+    commit id: "Коммит_ в variables"
+    commit id: "Коммит_ в result" type: HIGHLIGHT
+    checkout main
+    branch prepare_SRTzzzzz
+    commit id: "Коммит1 в variables"
+    commit id: "Коммит2 в variables" 
+    commit id: "Коммит3 в variables"
+    commit id: "Коммит4 в variables"
+    branch candidate_SRTzzzzz
+    checkout candidate_SRTzzzzz
+    commit id: "Коммит5 в result" type: HIGHLIGHT
+    checkout main
+    merge candidate_SRTyyyyy id: "Merge SRTyyyyy"
+    merge candidate_SRTzzzzz id: "Merge SRTzzzzz"
 ```
 
 ## Sequence Diagram
