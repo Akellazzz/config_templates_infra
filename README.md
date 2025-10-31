@@ -124,8 +124,7 @@ sequenceDiagram
     C->>C: Забирает ветку candidate*
     C->>C: Генерирует конфигурацию с новыми переменными
     C->>G: Коммит в results/
-    C->>G: Создает MR в main
-    C->>G: Создает MR на удаление ветки
+    C->>G: Создает MR candidate* -> main
     
     deactivate C
     
