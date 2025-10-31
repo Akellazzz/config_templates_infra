@@ -33,7 +33,7 @@ def trigger_generation() -> None:
         # Синхронизация репозитория
         repo_path = sync_repo(
             repo_url=settings.REPO_URL,
-            branch=settings.REPO_DEFAULT_BRANCH,
+            branch=settings.REMOTE_REPO_BRANCH,
             dest_dir=settings.repo_root,
         )
         print(f"Репозиторий готов в {repo_path}. Запуск генерации...")

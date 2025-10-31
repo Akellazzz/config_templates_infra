@@ -64,6 +64,8 @@ if __name__ == "__main__":
         reload=True, 
         )
  
+# python3 -m app.webhook_handler.webhook_listener
+
 """
 curl -X POST http://localhost:8080/webhook \
   -H 'Content-Type: application/json' \

@@ -43,7 +43,7 @@ def is_allowed_branch(ref: Optional[str]) -> bool:
     if not ref:
         return False
     
-    default_branch = settings.REPO_DEFAULT_BRANCH
+    default_branch = settings.REMOTE_REPO_BRANCH
     return ref in (f"refs/heads/{default_branch}", default_branch)
 
 

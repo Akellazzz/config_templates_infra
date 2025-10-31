@@ -18,7 +18,7 @@ def generate_for_sites(
     ensure_dir(results_dir)
 
     for site in sites:
-        variables_path = settings.variables_root / site / variables_file
+        variables_path = settings.variables_root_vty_acl / site / variables_file
         acl_entries = read_acl_entries(variables_path)
 
         context = {
@@ -74,7 +74,7 @@ def main(argv: Iterable[str] | None = None) -> None:
     )
     parser.add_argument(
         "--results-dir",
-        default="results",
+        default=str(settings.results_path),
         help="Directory to write rendered configuration",
     )
     parser.add_argument(
@@ -84,7 +84,7 @@ def main(argv: Iterable[str] | None = None) -> None:
     )
     parser.add_argument(
         "--template-dir",
-        default=str(settings.templates_root),
+        default=str(settings.templates_root_vty_acl),
         help="Directory containing Jinja2 template",
     )
     parser.add_argument(
@@ -97,9 +97,9 @@ def main(argv: Iterable[str] | None = None) -> None:
 
     raw_site = (args.site or "").strip()
     if raw_site.upper() == "ALL":
-        sites: List[str] = list_all_sites(settings.variables_root)
+        sites: List[str] = list_all_sites(settings.variables_root_vty_acl)
         if not sites:
-            raise FileNotFoundError(f"No sites found under: {settings.variables_root}")
+            raise FileNotFoundError(f"No sites found under: {settings.variables_root_vty_acl}")
     elif "," in raw_site:
         sites = [s.strip() for s in raw_site.split(",") if s.strip()]
     else:
