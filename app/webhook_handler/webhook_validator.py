@@ -1,7 +1,7 @@
 """Утилиты для валидации payload webhook запросов."""
 from typing import Optional
 
-from app_config import settings
+from app.app_config import settings
 
 
 def is_git_event(x_gitlab_event: Optional[str], x_github_event: Optional[str]) -> bool:
@@ -45,4 +45,5 @@ def is_allowed_branch(ref: Optional[str]) -> bool:
     
     default_branch = settings.REPO_DEFAULT_BRANCH
     return ref in (f"refs/heads/{default_branch}", default_branch)
+
 

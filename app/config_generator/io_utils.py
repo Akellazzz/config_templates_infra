@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List
 
-from models import AclEntry
+from app.config_generator.models import AclEntry
 
 
 def read_acl_entries(file_path: Path) -> List[AclEntry]:
@@ -30,3 +30,5 @@ def list_all_sites(variables_root: Path) -> List[str]:
     if not variables_root.exists():
         return []
     return [p.name for p in variables_root.iterdir() if p.is_dir()]
+
+

@@ -190,3 +190,4 @@ def commit_and_push_current_branch(repo_path: Path, message: str, remote: str = 
     current_branch = get_current_branch(repo_path)
     push_branch(repo_path, current_branch, remote)
 
+

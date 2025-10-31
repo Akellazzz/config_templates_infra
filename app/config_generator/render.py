@@ -13,3 +13,5 @@ def render_template(template_dir: Path, template_name: str, context: dict) -> st
     )
     template = env.get_template(template_name)
     return template.render(**context)
+
+

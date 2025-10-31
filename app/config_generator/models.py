@@ -5,3 +5,5 @@ from dataclasses import dataclass
 class AclEntry:
     ip: str
     wildcard: str
+
+

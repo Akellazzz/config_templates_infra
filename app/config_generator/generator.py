@@ -2,9 +2,9 @@ import argparse
 from pathlib import Path
 from typing import Iterable, List
 
-from io_utils import ensure_dir, list_all_sites, read_acl_entries
-from render import render_template
-from app_config import settings
+from app.config_generator.io_utils import ensure_dir, list_all_sites, read_acl_entries
+from app.config_generator.render import render_template
+from app.app_config import settings
 
 
 def generate_for_sites(
@@ -125,3 +125,5 @@ def main(argv: Iterable[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
+
+

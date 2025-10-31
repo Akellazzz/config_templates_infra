@@ -1,11 +1,22 @@
 """FastAPI webhook endpoint для запуска генерации кода."""
 from typing import Optional
+import uvicorn
+
+# Debugger-friendly bootstrap to resolve absolute imports when file is run directly
+import sys
+from pathlib import Path
+
+if __package__ is None or __package__ == "":
+    project_root = Path(__file__).resolve().parents[2]
+    project_root_str = project_root.as_posix()
+    if project_root_str not in sys.path:
+        sys.path.insert(0, project_root_str)
 
 from fastapi import FastAPI, Header, BackgroundTasks
 from fastapi.responses import PlainTextResponse
 
-from generation_service import trigger_generation
-from webhook_validator import (
+from app.config_generator.generation_service import trigger_generation
+from app.webhook_handler.webhook_validator import (
     extract_ref,
     is_allowed_branch,
     is_git_event,
@@ -42,16 +53,22 @@ async def webhook(
     # Запуск генерации в фоне
     background_tasks.add_task(trigger_generation)
     return PlainTextResponse("OK\n", status_code=200)
-
-
+ 
+ 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run("webhook_listener:app", host="0.0.0.0", port=8080, reload=True)
-
+ 
+    uvicorn.run(
+        "app.webhook_handler.webhook_listener:app", 
+        host="0.0.0.0", 
+        port=8080, 
+        reload=True, 
+        )
+ 
 """
 curl -X POST http://localhost:8080/webhook \
   -H 'Content-Type: application/json' \
   -H 'X-Gitlab-Event: Push Hook' \
   -d '{"ref":"refs/heads/main"}'
 """
+
+

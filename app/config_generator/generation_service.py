@@ -1,9 +1,9 @@
 """Сервис для координации синхронизации репозитория и генерации кода."""
 from pathlib import Path
 
-from app_config import settings
-from generator import main as vty_acl_generator
-from git_utils import (
+from app.app_config import settings
+from app.config_generator.generator import main as vty_acl_generator
+from app.config_generator.git_utils import (
     checkout_tracking_branch,
     get_current_commit_id,
     list_remote_branches,
@@ -18,12 +18,12 @@ class GenerationError(Exception):
 
 
 def trigger_generation() -> None:
-    """Синхронизирует репозиторий, запускает генерацию и создаёт ветку release candidate.
+    """Синхронизирует репозиторий, запускает генерацию и коммитит в текущую ветку.
     
     Это основная функция оркестрации, которая:
     1. Синхронизирует репозиторий с удалённого сервера
     2. Запускает генератор vty_acl
-    3. Создаёт и отправляет ветку release candidate с результатами
+    3. Коммитит и пушит изменения в ту же ветку candidate*
     
     Raises:
         GenerationError: Если любой этап процесса завершился с ошибкой
@@ -57,6 +57,7 @@ def trigger_generation() -> None:
                 vty_acl_generator()
                 print(f"Генерация успешно завершена для {branch}")
 
+                # Коммитим изменения в текущую ветку и пушим без создания release_candidate
                 commit_and_push_current_branch(
                     repo_path,
                     message=f"Auto-generate configs for {branch} (from {commit_id})",
@@ -82,4 +83,5 @@ def trigger_generation() -> None:
                 print(f"Локальный репозиторий удалён: {repo_path}")
         except Exception as cleanup_exc:
             print(f"Не удалось удалить локальный репозиторий {repo_path}: {cleanup_exc}")
+
 
