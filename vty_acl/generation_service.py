@@ -5,10 +5,10 @@ from app_config import settings
 from generator import main as vty_acl_generator
 from git_utils import (
     checkout_tracking_branch,
-    create_release_candidate_branch,
     get_current_commit_id,
     list_remote_branches,
     sync_repo,
+    commit_and_push_current_branch,
 )
 import shutil
 
@@ -57,8 +57,10 @@ def trigger_generation() -> None:
                 vty_acl_generator()
                 print(f"Генерация успешно завершена для {branch}")
 
-                # Создание ветки release candidate с результатами генерации
-                create_release_candidate_branch(repo_path, commit_id)
+                commit_and_push_current_branch(
+                    repo_path,
+                    message=f"Auto-generate configs for {branch} (from {commit_id})",
+                )
             except Exception as branch_exc:
                 msg = f"Ошибка при обработке ветки {branch}: {branch_exc}"
                 print(msg)

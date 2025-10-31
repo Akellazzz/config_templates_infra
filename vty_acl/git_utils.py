@@ -163,31 +163,30 @@ def push_branch(repo_path: Path, branch_name: str, remote: str = "origin") -> No
     run_git_command(["push", remote, branch_name], repo_path)
 
 
-def create_release_candidate_branch(
-    repo_path: Path, commit_id: str, branch_prefix: str = "release_candidate_"
-) -> None:
-    """Создаёт ветку release candidate со всеми текущими изменениями.
+def get_current_branch(repo_path: Path) -> str:
+    """Возвращает имя текущей ветки.
     
     Args:
         repo_path: Путь к репозиторию
-        commit_id: ID исходного коммита для release candidate
-        branch_prefix: Префикс для имени ветки
+    
+    Returns:
+        Имя текущей ветки
     """
-    branch_name = f"{branch_prefix}{commit_id}"
+    return run_git_command(["rev-parse", "--abbrev-ref", "HEAD"], repo_path)
+
+
+def commit_and_push_current_branch(repo_path: Path, message: str, remote: str = "origin") -> None:
+    """Коммитит все изменения и пушит их в текущую ветку.
     
+    Args:
+        repo_path: Путь к репозиторию
+        message: Сообщение коммита
+        remote: Имя удалённого репозитория (по умолчанию: origin)
+    """
     if not has_changes(repo_path):
-        print("Нет изменений для коммита, пропускаем создание release candidate")
+        print("Нет изменений для коммита, пропускаем отправку")
         return
-    
-    print(f"Создание ветки {branch_name}...")
-    create_branch(repo_path, branch_name)
-    
-    print("Добавление изменений...")
-    print("Создание коммита...")
-    commit_all_changes(repo_path, f"Release candidate от коммита {commit_id}")
-    
-    print(f"Отправка {branch_name} в удалённый репозиторий...")
-    push_branch(repo_path, branch_name)
-    
-    print(f"Ветка release candidate {branch_name} успешно создана и отправлена")
+    commit_all_changes(repo_path, message)
+    current_branch = get_current_branch(repo_path)
+    push_branch(repo_path, current_branch, remote)
 
