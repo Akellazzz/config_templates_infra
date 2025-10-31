@@ -1,7 +1,8 @@
 """Сервис для координации синхронизации репозитория и генерации кода."""
 
 from app.app_config import settings
-from app.config_generator.templates.vty_acl.generator import generate_config
+from app.config_generator.templates.vty_acl.generator import generate_config as generate_vty_acl_ntp_config
+from app.config_generator.templates.ntp.generator import generate_config as generate_ntp_config
 from app.config_generator.git_utils import (
     checkout_tracking_branch,
     get_current_commit_id,
@@ -53,7 +54,8 @@ def trigger_generation() -> None:
                 print(f"Текущий ID коммита ({branch}): {commit_id}")
 
                 # Запуск генерации
-                generate_config()
+                generate_vty_acl_ntp_config()
+                generate_ntp_config()
                 print(f"Генерация успешно завершена для {branch}")
 
                 # Коммитим изменения в текущую ветку и пушим без создания release_candidate

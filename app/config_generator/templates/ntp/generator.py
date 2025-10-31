@@ -9,13 +9,13 @@ from dataclasses import dataclass
 
 
 @dataclass
-class AclEntry:
+class NTPServer:
     ip: str
-    wildcard: str
+    priority: str
 
 
-def read_acl_entries(file_path: Path) -> List[AclEntry]:
-    entries: List[AclEntry] = []
+def read_ntp_servers(file_path: Path) -> List[NTPServer]:
+    entries: List[NTPServer] = []
     if not file_path.exists():
         raise FileNotFoundError(f"Variables file not found: {file_path}")
     with file_path.open("r", encoding="utf-8") as f:
@@ -26,9 +26,9 @@ def read_acl_entries(file_path: Path) -> List[AclEntry]:
             parts = [p.strip() for p in line.split(";")]
             if len(parts) != 2 or not parts[0] or not parts[1]:
                 raise ValueError(
-                    f"Invalid ACL line in {file_path.name}: '{line}'. Expected '<ip>;<wildcard>'"
+                    f"Invalid ACL line in {file_path.name}: '{line}'. Expected '<ip>;<priority>'"
                 )
-            entries.append(AclEntry(ip=parts[0], wildcard=parts[1]))
+            entries.append(NTPServer(ip=parts[0], priority=parts[1]))
     return entries
 
 
@@ -38,17 +38,17 @@ def generate_for_sites(
     results_dir: Path,
     template_dir: Path,
     template_name: str,
-    variables_vty_acl_dir: Path,
+    variables_ntp_servers_dir: Path,
 ) -> None:
 
     
     for site in sites:
-        variables_path = variables_vty_acl_dir / site / variables_file
-        acl_entries = read_acl_entries(variables_path)
+        variables_path = variables_ntp_servers_dir / site / variables_file
+        ntp_servers = read_ntp_servers(variables_path)
 
         context = {
             "site": site,
-            "acl_ssh_dc": acl_entries,
+            "ntp_servers": ntp_servers,
         }
 
         rendered = render_template(
@@ -57,7 +57,7 @@ def generate_for_sites(
             context=context,
         )
 
-        final_name = f"vty_ACL_{site}.txt"
+        final_name = f"NTP_servers_{site}.txt"
 
         output_path = Path(final_name)
         if not output_path.is_absolute():
@@ -70,23 +70,23 @@ def generate_for_sites(
 
 
 def generate_config() -> None:
-    """Генерация VTY ACL для всех сайтов."""
-    variables_file = "acl_ssh_dc.txt"
+    """Генерация конфигурации для всех сайтов."""
+    variables_file = "ntp_servers.txt"
     results_dir = settings.results_path
     ensure_dir(results_dir)
 
-    variables_vty_acl_dir = settings.variables_path / "vty_ACL/"
-    sites: List[str] = list_all_sites(variables_vty_acl_dir)
+    variables_ntp_servers_dir = settings.variables_path / "ntp_servers/"
+    sites: List[str] = list_all_sites(variables_ntp_servers_dir)
     if not sites:
-        # raise FileNotFoundError(
-        #     f"No sites found under: {variables_vty_acl_dir}"
-        # )
-        print(f"No sites found under: {variables_vty_acl_dir}")
+        print(f"No sites found under: {variables_ntp_servers_dir}")
+        return
     generate_for_sites(
         sites=sites,
         variables_file=variables_file,
         results_dir=results_dir,
         template_dir=Path(__file__).resolve().parent,
         template_name="template.j2",
-        variables_vty_acl_dir=variables_vty_acl_dir,
+        variables_ntp_servers_dir=variables_ntp_servers_dir,
     )
+
+

@@ -5,7 +5,7 @@ class Settings:
     # корневая директория, в которой находятся модули app и templates
     package_root = Path(__file__).resolve().parent.parent
 
-    # репо, из которого забираем переменные и в который отправляем результат
+    # репозиторий, из которого забираем переменные и в который отправляем результат
     REMOTE_REPO_NAME = "config_templates"
     REMOTE_REPO_BRANCH = "main"
     REPO_URL = f"https://github.com/Akellazzz/{REMOTE_REPO_NAME}.git"
