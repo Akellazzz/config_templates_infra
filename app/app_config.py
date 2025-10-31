@@ -17,18 +17,16 @@ class Settings:
     variables_path = repo_root / VARIABLES_DIR
     results_path = repo_root / RESULTS_DIR
 
-    # VTY ACL
-    VARIABLES_RELPATH_VTY_ACL = Path("variables/vty_ACL/")
-    TEMPLATES_ROOT = package_root / "templates"
-    TEMPLATES_RELPATH_VTY_ACL = Path("templates/vty_acl/")
-    variables_root_vty_acl = repo_root / "variables/vty_ACL/"
-    templates_root_vty_acl = package_root / TEMPLATES_RELPATH_VTY_ACL
+    # # VTY ACL
+    # TEMPLATES_ROOT = package_root / "app" / "config_generator" / "templates"
+    # TEMPLATES_RELPATH_VTY_ACL = Path("app/config_generator/templates/vty_acl/")
+    # variables_root_vty_acl = repo_root / "variables/template/"
+    # templates_root_vty_acl = package_root / TEMPLATES_RELPATH_VTY_ACL
 
-    # NTP
-    VARIABLES_RELPATH_NTP = Path("variables/NTP/")
-    TEMPLATES_RELPATH_NTP = Path("templates/NTP/")
-    variables_root_ntp = repo_root / VARIABLES_RELPATH_NTP
-    templates_root_ntp = package_root / TEMPLATES_RELPATH_NTP
+    # # NTP
+    # TEMPLATES_RELPATH_NTP = Path("app/config_generator/templates/NTP/")
+    # variables_root_ntp = repo_root / VARIABLES_RELPATH_NTP
+    # templates_root_ntp = package_root / TEMPLATES_RELPATH_NTP
 
 
 settings = Settings()
