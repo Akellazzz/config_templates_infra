@@ -1,3 +1,1 @@
 """Configuration generation package."""
-
-

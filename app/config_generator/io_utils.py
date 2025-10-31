@@ -30,5 +30,3 @@ def list_all_sites(variables_root: Path) -> List[str]:
     if not variables_root.exists():
         return []
     return [p.name for p in variables_root.iterdir() if p.is_dir()]
-
-

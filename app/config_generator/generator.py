@@ -56,7 +56,7 @@ def generate_for_sites(
         print(f"Rendered configuration written to: {output_path}")
 
 
-def main(argv: Iterable[str] | None = None) -> None:
+def generate_config(argv: Iterable[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
         description="Render vty ACL configuration using Jinja2 and variables."
     )
@@ -99,7 +99,9 @@ def main(argv: Iterable[str] | None = None) -> None:
     if raw_site.upper() == "ALL":
         sites: List[str] = list_all_sites(settings.variables_root_vty_acl)
         if not sites:
-            raise FileNotFoundError(f"No sites found under: {settings.variables_root_vty_acl}")
+            raise FileNotFoundError(
+                f"No sites found under: {settings.variables_root_vty_acl}"
+            )
     elif "," in raw_site:
         sites = [s.strip() for s in raw_site.split(",") if s.strip()]
     else:
@@ -124,6 +126,4 @@ def main(argv: Iterable[str] | None = None) -> None:
 
 
 if __name__ == "__main__":
-    main()
-
-
+    generate_config()

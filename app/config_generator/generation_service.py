@@ -1,8 +1,7 @@
 """Сервис для координации синхронизации репозитория и генерации кода."""
-from pathlib import Path
 
 from app.app_config import settings
-from app.config_generator.generator import main as vty_acl_generator
+from app.config_generator.generator import generate_config
 from app.config_generator.git_utils import (
     checkout_tracking_branch,
     get_current_commit_id,
@@ -19,12 +18,12 @@ class GenerationError(Exception):
 
 def trigger_generation() -> None:
     """Синхронизирует репозиторий, запускает генерацию и коммитит в текущую ветку.
-    
+
     Это основная функция оркестрации, которая:
     1. Синхронизирует репозиторий с удалённого сервера
     2. Запускает генератор vty_acl
     3. Коммитит и пушит изменения в ту же ветку candidate*
-    
+
     Raises:
         GenerationError: Если любой этап процесса завершился с ошибкой
     """
@@ -37,12 +36,12 @@ def trigger_generation() -> None:
             dest_dir=settings.repo_root,
         )
         print(f"Репозиторий готов в {repo_path}. Запуск генерации...")
-        
+
         # Получаем список веток по маске 'candidate*'
         candidate_branches = list_remote_branches(repo_path, "candidate*")
         if not candidate_branches:
             print("Не найдено веток по маске 'candidate*'")
-        
+
         errors: list[str] = []
         for branch in candidate_branches:
             try:
@@ -54,7 +53,7 @@ def trigger_generation() -> None:
                 print(f"Текущий ID коммита ({branch}): {commit_id}")
 
                 # Запуск генерации
-                vty_acl_generator()
+                generate_config()
                 print(f"Генерация успешно завершена для {branch}")
 
                 # Коммитим изменения в текущую ветку и пушим без создания release_candidate
@@ -69,7 +68,7 @@ def trigger_generation() -> None:
 
         if errors:
             raise GenerationError("; ".join(errors))
-        
+
     except Exception as exc:
         error_msg = f"Ошибка генерации: {exc}"
         print(error_msg)
@@ -82,6 +81,6 @@ def trigger_generation() -> None:
                 shutil.rmtree(repo_path.as_posix(), ignore_errors=True)
                 print(f"Локальный репозиторий удалён: {repo_path}")
         except Exception as cleanup_exc:
-            print(f"Не удалось удалить локальный репозиторий {repo_path}: {cleanup_exc}")
-
-
+            print(
+                f"Не удалось удалить локальный репозиторий {repo_path}: {cleanup_exc}"
+            )
