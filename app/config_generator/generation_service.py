@@ -1,8 +1,8 @@
 """Сервис для координации синхронизации репозитория и генерации кода."""
 
 from app.app_config import settings
-from app.config_generator.templates.vty_acl.generator import generate_config as generate_vty_acl_ntp_config
-from app.config_generator.templates.ntp.generator import generate_config as generate_ntp_config
+import importlib
+from pathlib import Path
 from app.config_generator.git_utils import (
     checkout_tracking_branch,
     get_current_commit_id,
@@ -16,6 +16,32 @@ import shutil
 class GenerationError(Exception):
     """Вызывается при ошибке процесса генерации."""
 
+
+def _discover_template_generators() -> list:
+    """Находит callable генераторы из templates/*/generator.py (generate_config)."""
+    generators: list = []
+    base_pkg = "app.config_generator.templates"
+    base_dir = Path(__file__).resolve().parent / "templates"
+    if not base_dir.exists():
+        return generators
+
+    for entry in sorted(base_dir.iterdir()):
+        if not entry.is_dir() or entry.name.startswith("_"):
+            continue
+        module_name = f"{base_pkg}.{entry.name}.generator"
+        try:
+            mod = importlib.import_module(module_name)
+        except Exception as exc:
+            print(f"Пропуск {module_name}: импорт неудачен ({exc})")
+            continue
+
+        gen = getattr(mod, "generate_config", None)
+        if callable(gen):
+            generators.append(gen)
+        else:
+            print(f"Пропуск {module_name}: нет функции generate_config()")
+
+    return generators
 
 def trigger_generation() -> None:
     """Синхронизирует репозиторий, запускает генерацию и коммитит в текущую ветку.
@@ -44,6 +70,9 @@ def trigger_generation() -> None:
             print("Не найдено веток по маске 'candidate*'")
 
         errors: list[str] = []
+        template_generators = _discover_template_generators()
+        if not template_generators:
+            print("Не найдено ни одного генератора в templates/*/generator.py")
         for branch in candidate_branches:
             try:
                 print(f"\n=== Обработка ветки {branch} ===")
@@ -53,9 +82,14 @@ def trigger_generation() -> None:
                 commit_id = get_current_commit_id(repo_path)
                 print(f"Текущий ID коммита ({branch}): {commit_id}")
 
-                # Запуск генерации
-                generate_vty_acl_ntp_config()
-                generate_ntp_config()
+                # Запуск генерации всех зарегистрированных шаблонов
+                for gen in template_generators:
+                    try:
+                        gen()
+                    except Exception as gen_exc:
+                        raise RuntimeError(
+                            f"Генератор {gen.__module__} завершился ошибкой: {gen_exc}"
+                        )
                 print(f"Генерация успешно завершена для {branch}")
 
                 # Коммитим изменения в текущую ветку и пушим без создания release_candidate
