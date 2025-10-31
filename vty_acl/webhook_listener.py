@@ -53,5 +53,5 @@ if __name__ == "__main__":
 curl -X POST http://localhost:8080/webhook \
   -H 'Content-Type: application/json' \
   -H 'X-Gitlab-Event: Push Hook' \
-  -d '{"ref":"refs/heads/vars"}'
+  -d '{"ref":"refs/heads/main"}'
 """
