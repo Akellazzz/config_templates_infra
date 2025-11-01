@@ -13,7 +13,7 @@ class Settings:
     RESULTS_DIR = "results"
 
     # локальная директория для репо
-    repo_root = package_root / REMOTE_REPO_NAME
+    repo_root = package_root / "temp" / REMOTE_REPO_NAME
     variables_path = repo_root / VARIABLES_DIR
     results_path = repo_root / RESULTS_DIR
 
