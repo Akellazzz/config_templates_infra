@@ -67,7 +67,7 @@ def trigger_generation() -> None:
                 # Коммитим изменения в текущую ветку и пушим без создания release_candidate
                 commit_and_push_current_branch(
                     repo_path,
-                    message=f"Auto-generate configs for {branch} (from {commit_id})",
+                    message=f"Auto-generated configs for branch {branch} (from {commit_id})",
                 )
             except Exception as branch_exc:
                 msg = f"Ошибка при обработке ветки {branch}: {branch_exc}"
