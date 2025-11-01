@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 import importlib
 import inspect
+from app.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class ConfigGenerator(ABC):
@@ -26,7 +29,7 @@ def get_generators() -> list[ConfigGenerator]:
     """Находит генераторы в templates/*/generator.py и возвращает список классов-наследников ConfigGenerator."""
     generators: list[ConfigGenerator] = []
     base_pkg = "app.config_generator.templates"
-    base_dir = Path(__file__).resolve().parent
+    base_dir = Path(__file__).resolve().parent / "templates"
     if not base_dir.exists():
         return generators
 
@@ -37,7 +40,7 @@ def get_generators() -> list[ConfigGenerator]:
         try:
             mod = importlib.import_module(module_name)
         except Exception as exc:
-            print(f"Пропуск {module_name}: импорт неудачен ({exc})")
+            logger.warning(f"Пропуск {module_name}: импорт неудачен ({exc})")
             continue
 
         found = False
@@ -52,7 +55,7 @@ def get_generators() -> list[ConfigGenerator]:
         if gen and issubclass(gen, ConfigGenerator):
             generators.append(gen())
         else:
-            print(f"Пропуск {module_name}: нет класса-наследника ConfigGenerator")
+            logger.warning(f"Пропуск {module_name}: нет класса-наследника ConfigGenerator")
 
     return generators
 

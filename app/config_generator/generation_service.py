@@ -9,7 +9,10 @@ from app.config_generator.git_utils import (
     sync_repo,
     commit_and_push_current_branch,
 )
+from app.logger import get_logger
 import shutil
+
+logger = get_logger(__name__)
 
 
 class GenerationError(Exception):
@@ -22,6 +25,7 @@ def trigger_generation() -> None:
     Raises:
         GenerationError: Если любой этап процесса завершился с ошибкой
     """
+    logger.info(f"Старт работы сервиса генерации конфигураций.")
     repo_path = None
     try:
         # Синхронизация репозитория
@@ -30,25 +34,25 @@ def trigger_generation() -> None:
             branch=settings.REMOTE_REPO_BRANCH,
             dest_dir=settings.repo_root,
         )
-        print(f"Репозиторий готов в {repo_path}. Запуск генерации...")
+        logger.info(f"Репозиторий готов в {repo_path}. Запуск генерации...")
 
         # Получаем список веток по маске 'candidate*'
         candidate_branches = list_remote_branches(repo_path, "candidate*")
         if not candidate_branches:
-            print("Не найдено веток по маске 'candidate*'")
+            logger.warning("Не найдено веток по маске 'candidate*'")
 
         errors: list[str] = []
         generators = get_generators()
         if not generators:
-            print("Не найдено ни одного генератора в templates/*/generator.py")
+            logger.warning("Не найдено ни одного генератора в templates/*/generator.py")
         for branch in candidate_branches:
             try:
-                print(f"\n=== Обработка ветки {branch} ===")
+                logger.info(f"=== Обработка ветки {branch} ===")
                 checkout_tracking_branch(repo_path, branch)
 
                 # Получение ID коммита для текущей ветки
                 commit_id = get_current_commit_id(repo_path)
-                print(f"Текущий ID коммита ({branch}): {commit_id}")
+                logger.info(f"Текущий ID коммита ({branch}): {commit_id}")
 
                 # Запуск генерации всех зарегистрированных шаблонов
                 for gen in generators:
@@ -58,7 +62,7 @@ def trigger_generation() -> None:
                         raise RuntimeError(
                             f"Генератор {gen.__module__} завершился ошибкой: {gen_exc}"
                         )
-                print(f"Генерация успешно завершена для {branch}")
+                logger.info(f"Генерация успешно завершена для {branch}")
 
                 # Коммитим изменения в текущую ветку и пушим без создания release_candidate
                 commit_and_push_current_branch(
@@ -67,7 +71,7 @@ def trigger_generation() -> None:
                 )
             except Exception as branch_exc:
                 msg = f"Ошибка при обработке ветки {branch}: {branch_exc}"
-                print(msg)
+                logger.error(msg)
                 errors.append(msg)
 
         if errors:
@@ -75,7 +79,7 @@ def trigger_generation() -> None:
 
     except Exception as exc:
         error_msg = f"Ошибка генерации: {exc}"
-        print(error_msg)
+        logger.error(error_msg)
         raise GenerationError(error_msg) from exc
     finally:
         # После обработки вебхука очищаем локальный клон репозитория,
@@ -83,8 +87,11 @@ def trigger_generation() -> None:
         try:
             if repo_path and repo_path.exists():
                 shutil.rmtree(repo_path.as_posix(), ignore_errors=True)
-                print(f"Локальный репозиторий удалён: {repo_path}")
+                logger.info(f"Локальный репозиторий удалён: {repo_path}")
         except Exception as cleanup_exc:
-            print(
+            logger.warning(
                 f"Не удалось удалить локальный репозиторий {repo_path}: {cleanup_exc}"
             )
+        logger.info(f"Сервис генерации конфигураций завершил работу.")
+        logger.info("=" * 100)
+        

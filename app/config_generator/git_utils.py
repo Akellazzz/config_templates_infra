@@ -2,6 +2,9 @@
 
 import subprocess
 from pathlib import Path
+from app.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class GitError(Exception):
@@ -100,7 +103,7 @@ def sync_repo(
     dest_path = Path(dest_dir)
 
     if (dest_path / ".git").exists():
-        print(f"Синхронизация существующего репозитория в {dest_path}...")
+        logger.info(f"Синхронизация существующего репозитория в {dest_path}...")
         # Забираем все ветки и теги
         run_git_command(["fetch", "--all", "--prune"], dest_path)
         run_git_command(["checkout", branch], dest_path)
@@ -109,7 +112,7 @@ def sync_repo(
         if not dest_path.exists():
             dest_path.mkdir(parents=True, exist_ok=True)
 
-        print(f"Клонирование {repo_url} (ветка {branch}) в {dest_path}...")
+        logger.info(f"Клонирование {repo_url} (ветка {branch}) в {dest_path}")
         # Клонируем репозиторий с полной историей и всеми ветками
         run_git_command(["clone", "--branch", branch, repo_url, dest_path.as_posix()])
         # Сразу обновляем все ссылки и ветки
@@ -189,9 +192,9 @@ def commit_and_push_current_branch(
         remote: Имя удалённого репозитория (по умолчанию: origin)
     """
     if not has_changes(repo_path):
-        print("Нет изменений для коммита, пропускаем отправку")
+        logger.info("Нет изменений для коммита, пропускаем отправку")
         return
     commit_all_changes(repo_path, message)
     current_branch = get_current_branch(repo_path)
     push_branch(repo_path, current_branch, remote)
-    print(f"Push commit with comment: {message}")
+    logger.info(f"Push commit with comment: {message}")

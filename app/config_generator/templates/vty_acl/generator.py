@@ -4,9 +4,12 @@ from typing import List
 from app.config_generator.io_utils import ensure_dir, list_all_sites
 from app.config_generator.render import render_template
 from app.app_config import settings
+from app.logger import get_logger
 
 from dataclasses import dataclass
 from app.config_generator.core import ConfigGenerator
+
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -28,7 +31,7 @@ class Generator(ConfigGenerator):
             # raise FileNotFoundError(
             #     f"No sites found under: {variables_vty_acl_dir}"
             # )
-            print(f"No sites found under: {variables_vty_acl_dir}")
+            logger.warning(f"No sites found under: {variables_vty_acl_dir}")
         self._generate_for_sites(
             sites=sites,
             variables_file=variables_file,
@@ -90,4 +93,4 @@ class Generator(ConfigGenerator):
             with output_path.open("w", encoding="utf-8", newline="\n") as f:
                 f.write(rendered.rstrip() + "\n")
 
-            print(f"Rendered configuration written to: {output_path}")
+            logger.info(f"Rendered configuration written to: {output_path}")
