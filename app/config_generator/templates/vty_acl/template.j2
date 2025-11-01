@@ -1,0 +1,12 @@
+{% set acl_name = 'ACL-VTY-' ~ site %}
+! Site: {{ site }}
+
+ip access-list {{ acl_name }}
+{% for entry in acl_ssh_dc -%}
+ permit {{ entry.ip }} {{ entry.wildcard }}
+{% endfor %}
+
+line vty 0 15
+ access-class {{ acl_name }} in
+
+

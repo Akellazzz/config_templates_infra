@@ -19,3 +19,8 @@ ENV/
 
 # Logs
 *.log
+
+.ruff_cache
+
+config_templates/
+results/

@@ -1,0 +1,6 @@
+! Site: {{ site }}
+
+{% for entry in ntp_servers -%}
+ ntp server {{ entry.priority }} {{ entry.ip }}
+{% endfor %}
+
