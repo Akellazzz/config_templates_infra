@@ -17,8 +17,8 @@ class NTPServer:
     ip: str
     priority: str
 
-class Generator(ConfigGenerator):
 
+class Generator(ConfigGenerator):
     def _read_ntp_servers(self, file_path: Path) -> List[NTPServer]:
         entries: List[NTPServer] = []
         if not file_path.exists():
@@ -36,7 +36,6 @@ class Generator(ConfigGenerator):
                 entries.append(NTPServer(ip=parts[0], priority=parts[1]))
         return entries
 
-
     def _generate_for_sites(
         self,
         sites: List[str],
@@ -46,7 +45,6 @@ class Generator(ConfigGenerator):
         template_name: str,
         variables_ntp_servers_dir: Path,
     ) -> None:
-
         for site in sites:
             variables_path = variables_ntp_servers_dir / site / variables_file
             ntp_servers = self._read_ntp_servers(variables_path)
@@ -73,7 +71,6 @@ class Generator(ConfigGenerator):
 
             logger.info(f"Rendered configuration written to: {output_path}")
 
-
     def generate_config(self) -> None:
         """Генерация конфигурации для всех сайтов."""
         variables_file = "ntp_servers.txt"
@@ -93,4 +90,3 @@ class Generator(ConfigGenerator):
             template_name="template.j2",
             variables_ntp_servers_dir=variables_ntp_servers_dir,
         )
-

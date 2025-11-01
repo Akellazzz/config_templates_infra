@@ -2,7 +2,6 @@ from pathlib import Path
 
 
 class Settings:
-
     # репозиторий, из которого забираем переменные и в который отправляем результат
     REMOTE_REPO_NAME = "config_templates"
     REMOTE_REPO_BRANCH = "main"
@@ -14,7 +13,7 @@ class Settings:
     package_root = Path(__file__).resolve().parent.parent
 
     temp_dir = package_root / "temp"
-    
+
     # локальная директория для репозитория
     repo_root = temp_dir / REMOTE_REPO_NAME
     variables_path = repo_root / VARIABLES_DIR

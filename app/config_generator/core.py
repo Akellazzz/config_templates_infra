@@ -55,8 +55,8 @@ def get_generators() -> list[ConfigGenerator]:
         if gen and issubclass(gen, ConfigGenerator):
             generators.append(gen())
         else:
-            logger.warning(f"Пропуск {module_name}: нет класса-наследника ConfigGenerator")
+            logger.warning(
+                f"Пропуск {module_name}: нет класса-наследника ConfigGenerator"
+            )
 
     return generators
-
-

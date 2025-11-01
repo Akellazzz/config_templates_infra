@@ -25,7 +25,7 @@ def trigger_generation() -> None:
     Raises:
         GenerationError: Если любой этап процесса завершился с ошибкой
     """
-    logger.info(f"Старт работы сервиса генерации конфигураций.")
+    logger.info("Старт работы сервиса генерации конфигураций.")
     repo_path = None
     try:
         # Синхронизация репозитория
@@ -92,6 +92,5 @@ def trigger_generation() -> None:
             logger.warning(
                 f"Не удалось удалить локальный репозиторий {repo_path}: {cleanup_exc}"
             )
-        logger.info(f"Сервис генерации конфигураций завершил работу.")
+        logger.info("Сервис генерации конфигураций завершил работу.")
         logger.info("=" * 100)
-        
