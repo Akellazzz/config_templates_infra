@@ -1,7 +1,7 @@
 """Сервис для координации синхронизации репозитория и генерации кода."""
 
 from app.app_config import settings
-from app.config_generator.templates.core import get_generators
+from app.config_generator.core import get_generators
 from app.config_generator.git_utils import (
     checkout_tracking_branch,
     get_current_commit_id,

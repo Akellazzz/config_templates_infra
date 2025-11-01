@@ -6,7 +6,7 @@ from app.config_generator.render import render_template
 from app.app_config import settings
 
 from dataclasses import dataclass
-from app.config_generator.templates.core import ConfigGenerator
+from app.config_generator.core import ConfigGenerator
 
 
 @dataclass
